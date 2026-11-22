@@ -472,6 +472,138 @@
       color: var(--accent-emerald);
     }
 
+    /* Cloud Sync Status Button */
+    .cloud-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 11px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      transition: all 0.18s ease;
+      white-space: nowrap;
+    }
+
+    .cloud-btn:hover {
+      border-color: var(--border-strong);
+      background: var(--bg-hover);
+    }
+
+    .cloud-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .cloud-btn.state-synced {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #34d399;
+    }
+
+    [data-theme="light"] .cloud-btn.state-synced {
+      color: #047857;
+    }
+
+    .cloud-btn.state-synced .cloud-dot {
+      background: #10b981;
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.7);
+    }
+
+    .cloud-btn.state-syncing {
+      background: rgba(56, 189, 248, 0.14);
+      border-color: rgba(56, 189, 248, 0.48);
+      color: #38bdf8;
+    }
+
+    @keyframes cloudPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.45; transform: scale(0.8); }
+    }
+
+    .cloud-btn.state-syncing .cloud-dot {
+      background: #38bdf8;
+      animation: cloudPulse 1s ease-in-out infinite;
+    }
+
+    .cloud-btn.state-error {
+      background: rgba(244, 63, 94, 0.14);
+      border-color: rgba(244, 63, 94, 0.45);
+      color: #fb7185;
+    }
+
+    .cloud-btn.state-error .cloud-dot {
+      background: #f43f5e;
+    }
+
+    /* Mobile-only compact widgets (hidden on desktop) */
+    .mobile-only {
+      display: none !important;
+    }
+
+    .mobile-stat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 8px;
+      border-radius: 9px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    .mobile-menu-wrap {
+      position: relative;
+    }
+
+    .mobile-menu-dropdown {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      z-index: 60;
+      min-width: 210px;
+      padding: 6px;
+      border-radius: 13px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .mobile-menu-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      width: 100%;
+      padding: 9px 11px;
+      border-radius: 9px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      text-align: left;
+      transition: background 0.14s;
+    }
+
+    .mobile-menu-item:hover {
+      background: var(--bg-hover);
+    }
+
+    .mobile-menu-item.danger {
+      color: #fb7185;
+    }
+
     /* =====================================================================
        4. MAIN CONTAINER & SHARED CARDS
        ===================================================================== */
@@ -1768,6 +1900,168 @@
       border-color: rgba(245, 158, 11, 0.42);
     }
 
+    /* Cloud Sync Modal Helpers */
+    .security-callout {
+      padding: 11px 13px;
+      border-radius: 12px;
+      background: rgba(56, 189, 248, 0.09);
+      border: 1px solid rgba(56, 189, 248, 0.28);
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.48;
+    }
+
+    .security-callout strong {
+      color: var(--text-primary);
+    }
+
+    .input-with-btn {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .switch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 11px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 42px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      border-radius: 99px;
+      background: var(--border-strong);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      left: 3px;
+      top: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #ffffff;
+      transition: transform 0.2s;
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+      background: #10b981;
+    }
+
+    .toggle-switch input:checked + .toggle-slider::before {
+      transform: translateX(18px);
+    }
+
+    .cloud-meta-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 9px 12px;
+      border-radius: 10px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      font-size: 11.5px;
+      color: var(--text-secondary);
+    }
+
+    .cloud-conflict-box {
+      padding: 13px;
+      border-radius: 13px;
+      background: rgba(245, 158, 11, 0.11);
+      border: 1.5px solid rgba(245, 158, 11, 0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .cloud-conflict-dates {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-size: 11.5px;
+    }
+
+    .cloud-conflict-card {
+      padding: 8px 10px;
+      border-radius: 9px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .cloud-actions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    /* Help Modal ("? Как это работает") */
+    .help-steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+    }
+
+    .help-step-card {
+      padding: 12px;
+      border-radius: 12px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .help-step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 7px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 7px;
+    }
+
+    .help-benefits {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .help-benefit-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 10px 12px;
+      border-radius: 11px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      font-size: 12.5px;
+    }
+
     /* Floating Interactive Tooltip */
     .floating-tooltip {
       position: fixed;
@@ -1847,19 +2141,182 @@
       .timer-layout { grid-template-columns: 1fr; }
     }
 
-    @media (max-width: 680px) {
-      .header-inner { padding: 10px 12px; }
-      .app-main { padding: 12px; }
+    @media (max-width: 767px) {
+      .desktop-only {
+        display: none !important;
+      }
+
+      .mobile-only {
+        display: inline-flex !important;
+      }
+
+      .header-inner {
+        padding: 7px 10px;
+        gap: 6px;
+      }
+
+      .header-top {
+        flex-wrap: nowrap;
+        gap: 6px;
+      }
+
+      .brand {
+        gap: 7px;
+      }
+
+      .brand-logo {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+      }
+
+      .brand-logo svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      .brand-title {
+        font-size: 13px;
+        white-space: nowrap;
+      }
+
+      .brand-sub {
+        display: none;
+      }
+
+      .header-actions {
+        gap: 5px;
+        flex-wrap: nowrap;
+      }
+
+      .btn-quick-today-mob {
+        padding: 6px 9px;
+        font-size: 11.5px;
+        border-radius: 9px;
+      }
+
+      .cloud-btn {
+        padding: 6px 8px;
+        border-radius: 9px;
+        gap: 4px;
+      }
+
+      .cloud-btn .cloud-label {
+        display: none;
+      }
+
+      .btn-icon {
+        width: 31px;
+        height: 31px;
+        border-radius: 9px;
+      }
+
+      .header-bottom {
+        padding-top: 6px;
+        gap: 0;
+      }
+
+      .tabs-bar {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        width: 100%;
+        padding: 3px;
+        gap: 3px;
+        overflow: visible;
+      }
+
+      .tab-btn {
+        justify-content: center;
+        padding: 6px 4px;
+        font-size: 11px;
+        gap: 3px;
+        border-radius: 8px;
+      }
+
+      .tab-btn .tab-badge {
+        display: none !important;
+      }
+
+      #matrix-mode-controls {
+        display: none !important;
+      }
+
+      .app-main {
+        padding: 10px;
+      }
+
+      .matrix-mini-bar {
+        padding: 8px 10px;
+        margin-bottom: 10px;
+        gap: 8px;
+      }
+
+      .matrix-mini-stats {
+        gap: 8px;
+        font-size: 11.5px;
+      }
+
+      .legend-inline, .mini-divider {
+        display: none;
+      }
+
+      .mini-progress-wrap {
+        min-width: 0;
+        gap: 7px;
+      }
+
+      .mini-progress-wrap .progress-track {
+        width: 64px;
+      }
+
+      .zoom-pills {
+        gap: 4px;
+        margin-bottom: 10px;
+      }
+
+      .zoom-pill-btn {
+        padding: 5px 8px;
+        font-size: 11px;
+        border-radius: 8px;
+      }
+
+      .zoom-card {
+        padding: 10px;
+        border-radius: 15px;
+      }
+
+      .zoom-header {
+        margin-bottom: 10px;
+      }
+
+      .zoom-grid .grid-3x3 {
+        gap: 6px;
+      }
+
+      .zoom-grid .m-cell {
+        min-height: 92px;
+        padding: 7px 8px;
+        border-radius: 10px;
+      }
+
+      .zoom-grid .m-cell-title {
+        font-size: 11px;
+      }
+
+      .zoom-cell-hint {
+        display: none;
+      }
+
       .kpi-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
       .kpi-card { padding: 12px; }
-      .kpi-value { font-size: 20px; }
+      .kpi-value { font-size: 19px; }
       .rhythm-grid { grid-template-columns: 1fr; }
       .ach-grid { grid-template-columns: 1fr; }
-      .zoom-grid .m-cell { min-height: 104px; padding: 8px; }
-      .zoom-grid .m-cell-title { font-size: 11.5px; }
+      .help-steps { grid-template-columns: 1fr; }
+      .cloud-conflict-dates { grid-template-columns: 1fr; }
+      .cloud-actions-grid { grid-template-columns: 1fr; }
       .checkin-buttons { grid-template-columns: 1fr; }
       .checkin-btn.full-span { grid-column: span 1; }
-      .rpg-widget { min-width: 180px; flex: 1; }
     }
   </style>
 </head>
@@ -1869,26 +2326,36 @@
   <header class="app-header">
     <div class="header-inner">
       <div class="header-top">
-        <!-- Brand -->
-        <div class="brand">
-          <div class="brand-logo" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
-              <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
-              <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
-              <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
-            </svg>
-          </div>
-          <div>
-            <div class="brand-title">
-              <span>Матрица Отани 9×9 · ML Engineer</span>
+        <!-- Brand + Compact Mobile Level/Streak -->
+        <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+          <div class="brand">
+            <div class="brand-logo" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+                <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+              </svg>
             </div>
-            <div class="brand-sub">Чарт Мандалы • 64 шага • График активности • RPG</div>
+            <div>
+              <div class="brand-title">
+                <span class="desktop-only">Матрица Отани 9×9 · ML Engineer</span>
+                <span class="mobile-only">ML 9×9</span>
+              </div>
+              <div class="brand-sub">Чарт Мандалы • 64 шага • График активности • RPG</div>
+            </div>
           </div>
+
+          <!-- Compact Mobile Level + Streak Badge -->
+          <button id="btn-mobile-rpg" type="button" class="mobile-stat-pill mobile-only" title="Уровень и серия">
+            <span class="mono" style="color:#fbbf24">L<span id="mob-level">1</span></span>
+            <span style="opacity:0.35">•</span>
+            <span class="mono" style="color:#fb923c">🔥<span id="mob-streak">0</span></span>
+          </button>
         </div>
 
-        <!-- RPG + Streak -->
-        <div class="header-stats">
+        <!-- Desktop RPG + Streak -->
+        <div class="header-stats desktop-only">
           <button id="btn-open-rpg" type="button" class="rpg-widget" title="Открыть уровни и ачивки">
             <div class="lvl-badge">L<span id="hdr-level">1</span></div>
             <div class="rpg-info">
@@ -1908,23 +2375,36 @@
           </button>
         </div>
 
-        <!-- Quick Actions -->
+        <!-- Quick Actions (Desktop + Compact Mobile) -->
         <div class="header-actions">
-          <button id="btn-quick-today" type="button" class="btn btn-primary" title="Быстро отметить сегодняшнюю активность">
-            <span>+ Отметить сегодня</span>
+          <button id="btn-quick-today" type="button" class="btn btn-primary btn-quick-today-mob" title="Быстро отметить сегодняшнюю активность">
+            <span class="desktop-only">+ Отметить сегодня</span>
+            <span class="mobile-only">+ Сегодня</span>
           </button>
-          <button id="btn-open-ach" type="button" class="btn" title="Ачивки">
+
+          <!-- Cloud Sync Status Button -->
+          <button id="btn-cloud-status" type="button" class="cloud-btn state-local" title="Личное облако (Google Таблица)">
+            <span class="cloud-dot" aria-hidden="true"></span>
+            <span>☁️</span>
+            <span id="cloud-status-label" class="cloud-label">Локально</span>
+          </button>
+
+          <!-- Help ("? Как это работает") -->
+          <button id="btn-open-help" type="button" class="btn btn-icon" title="Как работает Матрица Отани 9×9?" style="font-weight:800;font-size:14px;">?</button>
+
+          <!-- Desktop-only Utility Buttons -->
+          <button id="btn-open-ach" type="button" class="btn desktop-only" title="Ачивки">
             <span>🏆</span>
             <span class="mono"><span id="hdr-ach-count">0</span>/<span id="hdr-ach-total">14</span></span>
           </button>
-          <button id="btn-export" type="button" class="btn btn-icon" title="Экспорт прогресса в JSON">
+          <button id="btn-export" type="button" class="btn btn-icon desktop-only" title="Экспорт прогресса в JSON">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="7 10 12 15 17 10"></polyline>
               <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
           </button>
-          <label for="input-import" class="btn btn-icon" style="cursor:pointer" title="Импорт прогресса из JSON">
+          <label for="input-import" class="btn btn-icon desktop-only" style="cursor:pointer" title="Импорт прогресса из JSON">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="17 8 12 3 7 8"></polyline>
@@ -1932,23 +2412,47 @@
             </svg>
             <input id="input-import" type="file" accept=".json,application/json" class="hidden" />
           </label>
-          <button id="btn-theme" type="button" class="btn btn-icon" title="Переключить тему (Тёмная / Светлая)">
+          <button id="btn-theme" type="button" class="btn btn-icon desktop-only" title="Переключить тему (Тёмная / Светлая)">
             <span id="theme-icon">☀️</span>
           </button>
-          <button id="btn-reset-open" type="button" class="btn btn-icon" title="Сбросить все данные">
+          <button id="btn-reset-open" type="button" class="btn btn-icon desktop-only" title="Сбросить прогресс">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="1 4 1 10 7 10"></polyline>
               <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
             </svg>
           </button>
+
+          <!-- Mobile-only Compact Menu -->
+          <div class="mobile-menu-wrap mobile-only">
+            <button id="btn-mobile-menu" type="button" class="btn btn-icon" title="Меню" aria-expanded="false">⋮</button>
+            <div id="mobile-menu-dropdown" class="mobile-menu-dropdown hidden">
+              <button type="button" class="mobile-menu-item" id="mob-menu-ach">
+                <span>🏆 Уровни и ачивки</span>
+                <span class="mono" style="font-size:11px;color:var(--accent-amber)"><span id="mob-ach-count">0</span>/14</span>
+              </button>
+              <button type="button" class="mobile-menu-item" id="mob-menu-theme">
+                <span>🎨 Переключить тему</span>
+                <span id="mob-theme-icon">☀️</span>
+              </button>
+              <button type="button" class="mobile-menu-item" id="mob-menu-export">
+                <span>⬇️ Экспорт JSON</span>
+              </button>
+              <label for="input-import" class="mobile-menu-item" style="cursor:pointer" id="mob-menu-import">
+                <span>⬆️ Импорт JSON</span>
+              </label>
+              <button type="button" class="mobile-menu-item danger" id="mob-menu-reset">
+                <span>🗑️ Сбросить прогресс</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Navigation Tabs -->
+      <!-- Navigation Tabs (4 even columns on mobile, no scroll) -->
       <div class="header-bottom">
         <nav class="tabs-bar" role="tablist">
           <button class="tab-btn active" data-tab="matrix" role="tab">
-            <span>🧩</span><span>Матрица 9×9</span>
+            <span>🧩</span><span class="desktop-only">Матрица 9×9</span><span class="mobile-only">Матрица</span>
           </button>
           <button class="tab-btn" data-tab="activity" role="tab">
             <span>📈</span><span>Активность</span>
@@ -1958,11 +2462,11 @@
             <span>✅</span><span>Трекер</span>
           </button>
           <button class="tab-btn" data-tab="timer" role="tab">
-            <span>⏱️</span><span>Таймер и ритм</span>
+            <span>⏱️</span><span class="desktop-only">Таймер и ритм</span><span class="mobile-only">Таймер</span>
           </button>
         </nav>
 
-        <!-- Right side contextual controls for Matrix tab -->
+        <!-- Right side contextual controls for Matrix tab (desktop) -->
         <div id="matrix-mode-controls" class="pill-switch">
           <button id="btn-mode-full" type="button">Вся 9×9</button>
           <button id="btn-mode-zoom" type="button">Zoom 3×3</button>
@@ -1986,8 +2490,8 @@
               <div id="mini-bar" class="progress-fill progress-fill-main" style="width:0%"></div>
             </div>
           </div>
-          <span style="color:var(--border-strong)">|</span>
-          <span class="mono" style="font-weight:700;color:#fb923c">🔥 Серия: <span id="mini-streak">0</span> дн.</span>
+          <span class="mini-divider" style="color:var(--border-strong)">|</span>
+          <span class="mono desktop-only" style="font-weight:700;color:#fb923c">🔥 Серия: <span id="mini-streak">0</span> дн.</span>
           <div class="legend-inline">
             <span><span class="legend-dot" style="background:var(--text-muted)"></span>В планах</span>
             <span><span class="legend-dot" style="background:var(--accent-amber)"></span>В процессе</span>
@@ -2414,11 +2918,160 @@
       <div class="modal-head">
         <div>
           <h3 style="margin:0;font-size:17px;font-weight:800;">🏆 RPG-уровень и ачивки</h3>
-          <p class="section-sub">+15 XP «В процессе» • +50 XP «Выполнено» • +150 XP блок 8/8 • +10 XP/активный день • +1 XP / 5 мин</p>
+          <p class="section-sub">+15 XP «В процессе» • +50 XP «Выполнено» • +150 XP блок 8/8 • +10 XP/день • +20 XP/зал • +1 XP/5 мин</p>
         </div>
         <button id="btn-rpg-close" type="button" class="btn btn-icon">✕</button>
       </div>
       <div id="rpg-modal-body" class="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- ==================== CLOUD SYNC MODAL (Google Sheets + Apps Script) ==================== -->
+  <div id="cloud-modal-overlay" class="overlay hidden">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <div>
+          <h3 style="margin:0;font-size:16px;font-weight:800;">☁️ Личное облако (Google Таблица)</h3>
+          <p class="section-sub">Синхронизация прогресса между ПК, телефоном и чекбоксами таблицы</p>
+        </div>
+        <button id="btn-cloud-close" type="button" class="btn btn-icon">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="security-callout">
+          <strong>🔒 Безопасность и изоляция:</strong> URL веб-приложения и секретный ключ хранятся <strong>только в localStorage этого браузера</strong>, не зашиваются в код и не попадают в экспорт JSON. Любой другой человек по ссылке на сайт видит чистый локальный трекер и не имеет доступа к вашим данным.
+        </div>
+
+        <!-- Conflict Resolution Box (hidden until needed) -->
+        <div id="cloud-conflict-box" class="cloud-conflict-box hidden">
+          <div style="font-size:13px;font-weight:800;color:#fbbf24;">⚠️ Найдены данные и локально, и в облаке</div>
+          <div style="font-size:12px;color:var(--text-secondary);">Выбери, какую версию оставить основной:</div>
+          <div class="cloud-conflict-dates">
+            <div class="cloud-conflict-card">
+              <div style="font-size:10.5px;color:var(--text-muted);text-transform:uppercase;font-weight:700;">Локально (это устройство)</div>
+              <div id="conflict-local-date" class="mono" style="font-weight:700;margin-top:3px;">—</div>
+            </div>
+            <div class="cloud-conflict-card">
+              <div style="font-size:10.5px;color:var(--text-muted);text-transform:uppercase;font-weight:700;">В облаке (Google Таблица)</div>
+              <div id="conflict-cloud-date" class="mono" style="font-weight:700;margin-top:3px;">—</div>
+            </div>
+          </div>
+          <div class="cloud-actions-grid">
+            <button id="btn-conflict-use-cloud" type="button" class="btn btn-sky">⬇️ Взять из облака</button>
+            <button id="btn-conflict-use-local" type="button" class="btn btn-primary">⬆️ Перезаписать облако локальными</button>
+          </div>
+        </div>
+
+        <!-- URL input -->
+        <div>
+          <label for="cloud-url-input" style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">URL веб-приложения Apps Script</label>
+          <input id="cloud-url-input" type="url" class="input mono" style="font-size:12px;" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" />
+        </div>
+
+        <!-- Secret Key input -->
+        <div>
+          <label for="cloud-key-input" style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">Секретный ключ</label>
+          <div class="input-with-btn">
+            <input id="cloud-key-input" type="password" class="input mono" style="font-size:12.5px;" placeholder="Введите ваш секретный ключ" autocomplete="off" />
+            <button id="btn-toggle-key-vis" type="button" class="btn btn-icon" title="Показать / скрыть ключ">👁️</button>
+          </div>
+        </div>
+
+        <!-- Auto-sync toggle -->
+        <div class="switch-row">
+          <div>
+            <div style="font-size:13px;font-weight:700;">Автосинхронизация</div>
+            <div style="font-size:11.5px;color:var(--text-secondary);">Автоотправка через 1.5 сек после изменений + проверка при открытии</div>
+          </div>
+          <label class="toggle-switch">
+            <input id="cloud-autosync-toggle" type="checkbox" checked />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <!-- Status & Last Sync info -->
+        <div class="cloud-meta-strip">
+          <span>Последняя синхронизация: <strong id="cloud-last-sync" class="mono">никогда</strong></span>
+          <span>Чекбоксов в таблице: <strong id="cloud-synced-steps" class="mono">—</strong></span>
+        </div>
+
+        <!-- Action buttons -->
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button id="btn-cloud-connect" type="button" class="btn btn-primary" style="width:100%;padding:10px;">☁️ Подключить и проверить</button>
+          <div class="cloud-actions-grid">
+            <button id="btn-cloud-pull" type="button" class="btn">⬇️ Загрузить из облака</button>
+            <button id="btn-cloud-push" type="button" class="btn">⬆️ Отправить в облако</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-foot">
+        <button id="btn-cloud-disconnect" type="button" class="btn btn-danger">Отключить</button>
+        <button id="btn-cloud-done" type="button" class="btn">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== HELP MODAL ("? КАК ЭТО РАБОТАЕТ") ==================== -->
+  <div id="help-modal-overlay" class="overlay hidden">
+    <div class="modal modal-lg" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <div>
+          <h3 style="margin:0;font-size:17px;font-weight:800;">🧩 Как работает Матрица Отани 9×9</h3>
+          <p class="section-sub">Метод Mandala Chart японского бейсболиста Сёхэя Отани — от большой цели к 64 простым шагам</p>
+        </div>
+        <button id="btn-help-close" type="button" class="btn btn-icon">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div style="font-size:13px;color:var(--text-secondary);line-height:1.55;">
+          Большая цель часто пугает масштабом и вызывает прокрастинацию. Матрица 9×9 превращает её в наглядную карту местности на одном экране. Читается она <strong>из центра наружу</strong>:
+        </div>
+
+        <div class="help-steps">
+          <div class="help-step-card">
+            <div class="help-step-num" style="background:rgba(99,102,241,0.2);color:#818cf8;">1</div>
+            <div style="font-size:13px;font-weight:800;margin-bottom:4px;">1 главная цель</div>
+            <div style="font-size:12px;color:var(--text-secondary);line-height:1.4;">В самом центре (клетка 5×5) — ключевой результат, к которому вы идёте.</div>
+          </div>
+          <div class="help-step-card">
+            <div class="help-step-num" style="background:rgba(56,189,248,0.2);color:#38bdf8;">8</div>
+            <div style="font-size:13px;font-weight:800;margin-bottom:4px;">8 ключевых опор</div>
+            <div style="font-size:12px;color:var(--text-secondary);line-height:1.4;">Вокруг центра — 8 направлений, на которых держится цель: навыки, проекты, дисциплина и энергия.</div>
+          </div>
+          <div class="help-step-card">
+            <div class="help-step-num" style="background:rgba(16,185,129,0.2);color:#34d399;">64</div>
+            <div style="font-size:13px;font-weight:800;margin-bottom:4px;">64 конкретных шага</div>
+            <div style="font-size:12px;color:var(--text-secondary);line-height:1.4;">Каждая опора раскрывается в своём внешнем квадрате 3×3 на 8 измеримых действий.</div>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:12px;font-weight:800;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;">Почему это лучше обычного списка задач</div>
+          <div class="help-benefits">
+            <div class="help-benefit-item">
+              <span style="font-size:18px;line-height:1;">🗺️</span>
+              <div><strong>Принцип «зума» как на карте:</strong> вместо бесконечного списка из 64 строк вы видите всю стратегию целиком, но в любой момент фокусируетесь на одном компактном квадрате 3×3.</div>
+            </div>
+            <div class="help-benefit-item">
+              <span style="font-size:18px;line-height:1;">🔋</span>
+              <div><strong>Учитывается вся жизнь, а не только учёба:</strong> отдельные блоки под сон, спорт, отдых и дисциплину не дают выгореть на дистанции.</div>
+            </div>
+            <div class="help-benefit-item">
+              <span style="font-size:18px;line-height:1;">⚡</span>
+              <div><strong>Снимает ступор старта:</strong> когда садитесь заниматься, не нужно придумывать, с чего начать — открываете одну клетку, ставите таймер и видите живой прогресс на тепловой карте.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="security-callout" style="background:rgba(16,185,129,0.09);border-color:rgba(16,185,129,0.3);">
+          <strong>🛡️ Прогресс каждого пользователя изолирован:</strong> все отметки, заметки и график активности сохраняются локально в памяти вашего браузера. Можно свободно кликать и тестировать трекер — ваши действия не повлияют на чужие данные.
+        </div>
+      </div>
+
+      <div class="modal-foot" style="justify-content:flex-end;">
+        <button id="btn-help-ok" type="button" class="btn btn-primary">Понятно, поехали!</button>
+      </div>
     </div>
   </div>
 
@@ -2453,8 +3106,9 @@
       // =========================================================================
       // 1. CONSTANTS & EXACT VERBATIM MATRIX DATA
       // =========================================================================
-      const STORAGE_KEY = 'ohtani_ml_matrix_v2';
-      const LEGACY_KEY = 'ohtani_ml_engineer_matrix_v1';
+      const STORAGE_KEY = 'ohtani_ml_state_v2';
+      const LEGACY_KEYS = ['ohtani_ml_matrix_v2', 'ohtani_ml_engineer_matrix_v1'];
+      const CLOUD_CFG_KEY = 'ohtani_ml_cloud_cfg_v1';
       const MAIN_GOAL = 'СТАТЬ ML ENGINEER';
       const MANDALA_ORDER = [1, 2, 3, 4, 'center', 5, 6, 7, 8];
 
@@ -2463,9 +3117,9 @@
           id: 1,
           title: '1. Python и разработка',
           icon: '🐍',
-          accent: '#38bdf8',
-          glow: 'rgba(56, 189, 248, 0.36)',
-          tint: 'rgba(56, 189, 248, 0.11)',
+          accent: '#22d3ee',
+          glow: 'rgba(34, 211, 238, 0.36)',
+          tint: 'rgba(34, 211, 238, 0.11)',
           steps: [
             { num: 1, title: 'Чистый Python (ООП, типы, PEP8)', hint: 'Классы, dataclass, аннотации типов' },
             { num: 2, title: 'NumPy (матрицы, векторы)', hint: 'Broadcasting, векторизация' },
@@ -2481,9 +3135,9 @@
           id: 2,
           title: '2. Алгоритмы и структуры данных',
           icon: '⚡',
-          accent: '#a78bfa',
-          glow: 'rgba(167, 139, 250, 0.36)',
-          tint: 'rgba(167, 139, 250, 0.11)',
+          accent: '#818cf8',
+          glow: 'rgba(129, 140, 248, 0.36)',
+          tint: 'rgba(129, 140, 248, 0.11)',
           steps: [
             { num: 1, title: 'Сложность кода (Big O по времени и памяти)', hint: 'Асимптотика, space/time trade-off' },
             { num: 2, title: 'Массивы и два указателя', hint: 'Two Pointers, Sliding Window' },
@@ -2571,9 +3225,9 @@
           id: 7,
           title: '7. Система и дисциплина',
           icon: '⚙️',
-          accent: '#60a5fa',
-          glow: 'rgba(96, 165, 250, 0.36)',
-          tint: 'rgba(96, 165, 250, 0.11)',
+          accent: '#38bdf8',
+          glow: 'rgba(56, 189, 248, 0.36)',
+          tint: 'rgba(56, 189, 248, 0.11)',
           steps: [
             { num: 1, title: 'Слоты Пн/Ср/Чт (19:15–20:45)', hint: 'Фиксированные рабочие сессии' },
             { num: 2, title: 'Разогрев 10 мин + план на след. раз', hint: 'Быстрый вход в поток без прокрастинации' },
@@ -2641,9 +3295,9 @@
       const TIMER_PRESETS = [
         { id: 'micro', label: 'Микро-шаг', minutes: 2, icon: '⚡', desc: 'В тяжёлый день' },
         { id: 'warmup', label: 'Разогрев', minutes: 10, icon: '🔥', desc: 'Повтор прошлого' },
-        { id: 'light', label: 'Лёгкий слот Вт/Пт', minutes: 30, icon: '🌿', desc: 'В дни зала' },
+        { id: 'pomo25', label: 'Помодоро', minutes: 25, icon: '🍅', desc: 'Быстрый слот Вт/Пт' },
         { id: 'focus45', label: 'Глубокий фокус', minutes: 45, icon: '🎯', desc: 'Базовый блок' },
-        { id: 'slot90', label: 'Вечерний слот Пн/Ср/Чт', minutes: 90, icon: '💻', desc: '19:15–20:45' },
+        { id: 'slot90', label: 'Будничный слот', minutes: 90, icon: '💻', desc: 'Пн/Ср/Чт 19:15–20:45' },
         { id: 'weekend180', label: 'Выходной блок', minutes: 180, icon: '🚀', desc: 'Сб / Вс (3 часа)' },
       ];
 
@@ -2701,6 +3355,23 @@
         return `${h} ч ${m} м`;
       }
 
+      function formatIsoTimestamp(iso) {
+        if (!iso) return 'неизвестно';
+        try {
+          const d = new Date(iso);
+          if (Number.isNaN(d.getTime())) return 'неизвестно';
+          return d.toLocaleString('ru-RU', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          });
+        } catch (_) {
+          return 'неизвестно';
+        }
+      }
+
       function escapeHtml(str) {
         return String(str || '')
           .replace(/&/g, '&amp;')
@@ -2710,7 +3381,7 @@
       }
 
       // =========================================================================
-      // 3. STATE MANAGEMENT & PERSISTENCE
+      // 3. STATE MANAGEMENT, MIGRATION & PERSONAL CLOUD SYNC ENGINE
       // =========================================================================
       function createDefaultState() {
         const steps = {};
@@ -2727,97 +3398,146 @@
         return {
           theme: 'dark',
           activeTab: 'matrix',
-          matrixMode: window.innerWidth < 1040 ? 'zoom' : 'full',
+          matrixMode: window.innerWidth < 900 ? 'zoom' : 'full',
           zoomTarget: 'center',
           highlightedBlock: null,
           heatmapMonths: 6,
           soundEnabled: true,
           timerSessionsCount: 0,
+          updatedAt: null,
           steps,
-          // activity: { 'YYYY-MM-DD': { minutes: number, gym: boolean, note: string, events: string[], isDemo?: boolean } }
           activity: {},
           unlockedAchievements: [],
         };
       }
 
-      function loadState() {
+      function normalizeState(parsed, isLegacy = false) {
         const defaults = createDefaultState();
-        try {
-          let raw = localStorage.getItem(STORAGE_KEY);
-          let isLegacy = false;
-          if (!raw) {
-            raw = localStorage.getItem(LEGACY_KEY);
-            isLegacy = Boolean(raw);
-          }
-          if (!raw) return defaults;
+        if (!parsed || typeof parsed !== 'object') return defaults;
 
-          const parsed = JSON.parse(raw);
-          if (!parsed || typeof parsed !== 'object') return defaults;
+        const mergedSteps = { ...defaults.steps };
+        if (parsed.steps && typeof parsed.steps === 'object') {
+          Object.keys(mergedSteps).forEach((id) => {
+            const src = parsed.steps[id];
+            if (src) {
+              mergedSteps[id] = {
+                status: ['todo', 'in_progress', 'done'].includes(src.status) ? src.status : 'todo',
+                focused: Boolean(src.focused),
+                note: typeof src.note === 'string' ? src.note : '',
+              };
+            }
+          });
+        }
 
-          const mergedSteps = { ...defaults.steps };
-          if (parsed.steps && typeof parsed.steps === 'object') {
-            Object.keys(mergedSteps).forEach((id) => {
-              const src = parsed.steps[id];
-              if (src) {
-                mergedSteps[id] = {
-                  status: ['todo', 'in_progress', 'done'].includes(src.status) ? src.status : 'todo',
-                  focused: Boolean(src.focused),
-                  note: typeof src.note === 'string' ? src.note : '',
+        const mergedActivity = {};
+        if (parsed.activity && typeof parsed.activity === 'object') {
+          Object.keys(parsed.activity).forEach((dateKey) => {
+            if (/^\d{4}-\d{2}-\d{2}$/.test(dateKey)) {
+              const a = parsed.activity[dateKey];
+              if (a && typeof a === 'object') {
+                mergedActivity[dateKey] = {
+                  minutes: Math.max(0, Number(a.minutes) || 0),
+                  gym: Boolean(a.gym),
+                  note: typeof a.note === 'string' ? a.note : '',
+                  events: Array.isArray(a.events) ? a.events.slice(0, 30) : [],
+                  isDemo: Boolean(a.isDemo),
                 };
               }
-            });
-          }
+            }
+          });
+        } else if (isLegacy && Array.isArray(parsed.sessions)) {
+          parsed.sessions.forEach((s) => {
+            const dk = s.date ? toDateKey(new Date(s.date)) : getTodayKey();
+            if (!mergedActivity[dk]) mergedActivity[dk] = { minutes: 0, gym: false, note: '', events: [] };
+            mergedActivity[dk].minutes += Number(s.minutes) || 0;
+          });
+        }
 
-          const mergedActivity = {};
-          if (parsed.activity && typeof parsed.activity === 'object') {
-            Object.keys(parsed.activity).forEach((dateKey) => {
-              if (/^\d{4}-\d{2}-\d{2}$/.test(dateKey)) {
-                const a = parsed.activity[dateKey];
-                if (a && typeof a === 'object') {
-                  mergedActivity[dateKey] = {
-                    minutes: Math.max(0, Number(a.minutes) || 0),
-                    gym: Boolean(a.gym),
-                    note: typeof a.note === 'string' ? a.note : '',
-                    events: Array.isArray(a.events) ? a.events.slice(0, 30) : [],
-                    isDemo: Boolean(a.isDemo),
-                  };
-                }
+        const preferredMode = parsed.matrixMode || parsed.matrixViewMode;
+        const finalMatrixMode = window.innerWidth < 900
+          ? 'zoom'
+          : (['full', 'zoom'].includes(preferredMode) ? preferredMode : defaults.matrixMode);
+
+        return {
+          ...defaults,
+          theme: parsed.theme === 'light' ? 'light' : 'dark',
+          activeTab: ['matrix', 'activity', 'tracker', 'timer'].includes(parsed.activeTab) ? parsed.activeTab : 'matrix',
+          matrixMode: finalMatrixMode,
+          zoomTarget: parsed.zoomTarget === 'center' || (Number(parsed.zoomTarget) >= 1 && Number(parsed.zoomTarget) <= 8)
+            ? (parsed.zoomTarget === 'center' ? 'center' : Number(parsed.zoomTarget))
+            : 'center',
+          highlightedBlock: null,
+          heatmapMonths: [3, 6, 12].includes(Number(parsed.heatmapMonths)) ? Number(parsed.heatmapMonths) : 6,
+          soundEnabled: parsed.soundEnabled !== false,
+          timerSessionsCount: Number(parsed.timerSessionsCount) || (Array.isArray(parsed.sessions) ? parsed.sessions.length : 0),
+          updatedAt: typeof parsed.updatedAt === 'string' ? parsed.updatedAt : null,
+          steps: mergedSteps,
+          activity: mergedActivity,
+          unlockedAchievements: Array.isArray(parsed.unlockedAchievements) ? parsed.unlockedAchievements : [],
+        };
+      }
+
+      function loadState() {
+        try {
+          let raw = localStorage.getItem(STORAGE_KEY);
+          let migrated = false;
+          let isOldV1 = false;
+          if (!raw) {
+            for (const oldKey of LEGACY_KEYS) {
+              const found = localStorage.getItem(oldKey);
+              if (found) {
+                raw = found;
+                migrated = true;
+                isOldV1 = oldKey === 'ohtani_ml_engineer_matrix_v1';
+                break;
               }
-            });
-          } else if (isLegacy && Array.isArray(parsed.sessions)) {
-            // Smoothly migrate timer sessions from v1 if present
-            parsed.sessions.forEach((s) => {
-              const dk = s.date ? toDateKey(new Date(s.date)) : getTodayKey();
-              if (!mergedActivity[dk]) mergedActivity[dk] = { minutes: 0, gym: false, note: '', events: [] };
-              mergedActivity[dk].minutes += Number(s.minutes) || 0;
-            });
+            }
           }
-
-          return {
-            ...defaults,
-            theme: parsed.theme === 'light' ? 'light' : 'dark',
-            activeTab: ['matrix', 'activity', 'tracker', 'timer'].includes(parsed.activeTab) ? parsed.activeTab : 'matrix',
-            matrixMode: ['full', 'zoom'].includes(parsed.matrixMode || parsed.matrixViewMode)
-              ? (parsed.matrixMode || parsed.matrixViewMode)
-              : defaults.matrixMode,
-            zoomTarget: parsed.zoomTarget === 'center' || (Number(parsed.zoomTarget) >= 1 && Number(parsed.zoomTarget) <= 8)
-              ? (parsed.zoomTarget === 'center' ? 'center' : Number(parsed.zoomTarget))
-              : 'center',
-            highlightedBlock: null,
-            heatmapMonths: [3, 6, 12].includes(Number(parsed.heatmapMonths)) ? Number(parsed.heatmapMonths) : 6,
-            soundEnabled: parsed.soundEnabled !== false,
-            timerSessionsCount: Number(parsed.timerSessionsCount) || (Array.isArray(parsed.sessions) ? parsed.sessions.length : 0),
-            steps: mergedSteps,
-            activity: mergedActivity,
-            unlockedAchievements: Array.isArray(parsed.unlockedAchievements) ? parsed.unlockedAchievements : [],
-          };
+          if (!raw) return createDefaultState();
+          const parsed = JSON.parse(raw);
+          const normalized = normalizeState(parsed, isOldV1);
+          if (migrated) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
+          }
+          return normalized;
         } catch (err) {
           console.error('Ошибка чтения localStorage:', err);
-          return defaults;
+          return createDefaultState();
+        }
+      }
+
+      function loadCloudConfig() {
+        const def = { url: '', secretKey: '', autoSync: true, lastSyncAt: null, lastSyncedSteps: null };
+        try {
+          const raw = localStorage.getItem(CLOUD_CFG_KEY);
+          if (!raw) return def;
+          const parsed = JSON.parse(raw);
+          return {
+            url: typeof parsed.url === 'string' ? parsed.url.trim() : '',
+            secretKey: typeof parsed.secretKey === 'string' ? parsed.secretKey : '',
+            autoSync: parsed.autoSync !== false,
+            lastSyncAt: typeof parsed.lastSyncAt === 'string' ? parsed.lastSyncAt : null,
+            lastSyncedSteps: typeof parsed.lastSyncedSteps === 'number' ? parsed.lastSyncedSteps : null,
+          };
+        } catch (_) {
+          return def;
+        }
+      }
+
+      function saveCloudConfig() {
+        try {
+          localStorage.setItem(CLOUD_CFG_KEY, JSON.stringify(cloudCfg));
+        } catch (err) {
+          console.error('Ошибка сохранения настроек облака:', err);
         }
       }
 
       let state = loadState();
+      let cloudCfg = loadCloudConfig();
+      let cloudStatus = (cloudCfg.url && cloudCfg.secretKey) ? 'synced' : 'local'; // 'local' | 'synced' | 'syncing' | 'error'
+      let cloudSyncTimer = null;
+      let pendingCloudConflict = null;
+
       let activeDrawerStepId = null;
       let activeEditDateKey = null;
       let editModalGymState = false;
@@ -2836,9 +3556,317 @@
         taskId: '',
       };
 
-      function saveState() {
+      function isCloudConfigured() {
+        return Boolean(cloudCfg.url && cloudCfg.secretKey);
+      }
+
+      function hasMeaningfulProgress(st) {
+        if (!st) return false;
+        if ((st.timerSessionsCount || 0) > 0) return true;
+        if (st.steps) {
+          for (const id of Object.keys(st.steps)) {
+            const s = st.steps[id];
+            if (s && (s.status !== 'todo' || s.focused || (s.note && s.note.trim().length > 0))) {
+              return true;
+            }
+          }
+        }
+        if (st.activity) {
+          for (const dk of Object.keys(st.activity)) {
+            const a = st.activity[dk];
+            if (a && !a.isDemo && (isDayActive(a) || (a.note && a.note.trim().length > 0))) {
+              return true;
+            }
+          }
+        }
+        return false;
+      }
+
+      function buildSheetStatuses(st) {
+        const statuses = {};
+        BLOCKS.forEach((b) => {
+          b.steps.forEach((s) => {
+            const id = `${b.id}-${s.num}`;
+            statuses[s.title] = Boolean(st.steps[id] && st.steps[id].status === 'done');
+          });
+        });
+        return statuses;
+      }
+
+      function setCloudStatus(nextStatus) {
+        cloudStatus = nextStatus;
+        renderCloudStatusButton();
+      }
+
+      function renderCloudStatusButton() {
+        const btn = document.getElementById('btn-cloud-status');
+        const lbl = document.getElementById('cloud-status-label');
+        if (!btn || !lbl) return;
+
+        btn.classList.remove('state-local', 'state-synced', 'state-syncing', 'state-error');
+        btn.classList.add(`state-${cloudStatus}`);
+
+        const map = {
+          local: 'Локально',
+          synced: 'Облако ✓',
+          syncing: 'Синхр...',
+          error: 'Ошибка',
+        };
+        lbl.textContent = map[cloudStatus] || 'Локально';
+        btn.title = `Личное облако: ${lbl.textContent}`;
+      }
+
+      function renderCloudModalMeta() {
+        const lastEl = document.getElementById('cloud-last-sync');
+        const stepsEl = document.getElementById('cloud-synced-steps');
+        if (lastEl) {
+          lastEl.textContent = cloudCfg.lastSyncAt ? formatIsoTimestamp(cloudCfg.lastSyncAt) : 'никогда';
+        }
+        if (stepsEl) {
+          stepsEl.textContent = typeof cloudCfg.lastSyncedSteps === 'number'
+            ? `${cloudCfg.lastSyncedSteps} / 64`
+            : '—';
+        }
+        const conflictBox = document.getElementById('cloud-conflict-box');
+        if (conflictBox) {
+          if (pendingCloudConflict) {
+            conflictBox.classList.remove('hidden');
+            document.getElementById('conflict-local-date').textContent = state.updatedAt
+              ? formatIsoTimestamp(state.updatedAt)
+              : 'текущая сессия';
+            document.getElementById('conflict-cloud-date').textContent = pendingCloudConflict.updatedAt
+              ? formatIsoTimestamp(pendingCloudConflict.updatedAt)
+              : 'есть данные';
+          } else {
+            conflictBox.classList.add('hidden');
+          }
+        }
+      }
+
+      async function cloudApiLoad(url, key) {
+        const sep = url.includes('?') ? '&' : '?';
+        const fullUrl = `${url}${sep}key=${encodeURIComponent(key)}&action=load`;
+        const res = await fetch(fullUrl, { method: 'GET', redirect: 'follow' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        if (!json || !json.ok) {
+          throw new Error((json && json.error) || 'Не удалось загрузить данные из облака');
+        }
+        return json;
+      }
+
+      async function cloudApiSave(url, key, statePayload) {
+        const updatedAt = statePayload.updatedAt || new Date().toISOString();
+        const body = JSON.stringify({
+          key,
+          action: 'save',
+          updatedAt,
+          data: statePayload,
+          sheetStatuses: buildSheetStatuses(statePayload),
+        });
+        const res = await fetch(url, {
+          method: 'POST',
+          redirect: 'follow',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body,
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        if (!json || !json.ok) {
+          throw new Error((json && json.error) || 'Не удалось сохранить данные в облако');
+        }
+        return json;
+      }
+
+      function applyCloudStatePayload(cloudData, updatedAt) {
+        const prevTab = state.activeTab;
+        const prevTheme = state.theme;
+        const normalized = normalizeState(cloudData, false);
+        normalized.updatedAt = updatedAt || normalized.updatedAt || new Date().toISOString();
+        normalized.activeTab = prevTab;
+        if (!cloudData.theme) normalized.theme = prevTheme;
+        state = normalized;
+        saveState(false);
+        applyTheme();
+        renderAll();
+      }
+
+      async function pushToCloud({ silent = false } = {}) {
+        if (!isCloudConfigured()) {
+          if (!silent) showToast('Сначала укажите URL и секретный ключ', 'error');
+          return false;
+        }
+        setCloudStatus('syncing');
         try {
+          if (!state.updatedAt) {
+            state.updatedAt = new Date().toISOString();
+            saveState(false);
+          }
+          const resp = await cloudApiSave(cloudCfg.url, cloudCfg.secretKey, state);
+          cloudCfg.lastSyncAt = resp.updatedAt || new Date().toISOString();
+          if (typeof resp.syncedSteps === 'number') {
+            cloudCfg.lastSyncedSteps = resp.syncedSteps;
+          }
+          state.updatedAt = cloudCfg.lastSyncAt;
+          saveState(false);
+          saveCloudConfig();
+          pendingCloudConflict = null;
+          setCloudStatus('synced');
+          renderCloudModalMeta();
+          if (!silent) {
+            const extra = typeof resp.syncedSteps === 'number' ? ` (таблица: ${resp.syncedSteps} шагов)` : '';
+            showToast(`☁️ Сохранено в облако${extra}`, 'success');
+          }
+          return true;
+        } catch (err) {
+          console.error('Ошибка отправки в облако:', err);
+          setCloudStatus('error');
+          if (!silent) showToast(`☁️ Ошибка: ${err.message}`, 'error');
+          return false;
+        }
+      }
+
+      async function pullFromCloud({ silent = false } = {}) {
+        if (!isCloudConfigured()) {
+          if (!silent) showToast('Сначала укажите URL и секретный ключ', 'error');
+          return false;
+        }
+        setCloudStatus('syncing');
+        try {
+          const resp = await cloudApiLoad(cloudCfg.url, cloudCfg.secretKey);
+          if (resp.empty || !resp.data) {
+            setCloudStatus('synced');
+            if (!silent) showToast('В облаке пока нет сохранённых данных', 'info');
+            return false;
+          }
+          applyCloudStatePayload(resp.data, resp.updatedAt);
+          cloudCfg.lastSyncAt = resp.updatedAt || new Date().toISOString();
+          saveCloudConfig();
+          pendingCloudConflict = null;
+          setCloudStatus('synced');
+          renderCloudModalMeta();
+          if (!silent) showToast('⬇️ Данные загружены из облака!', 'success');
+          return true;
+        } catch (err) {
+          console.error('Ошибка загрузки из облака:', err);
+          setCloudStatus('error');
+          if (!silent) showToast(`☁️ Ошибка: ${err.message}`, 'error');
+          return false;
+        }
+      }
+
+      async function connectAndCheckCloud() {
+        const url = document.getElementById('cloud-url-input').value.trim();
+        const key = document.getElementById('cloud-key-input').value.trim();
+        const autoSync = document.getElementById('cloud-autosync-toggle').checked;
+
+        if (!url || !/^https:\/\/.+/i.test(url)) {
+          showToast('Введите корректный HTTPS URL веб-приложения Apps Script', 'error');
+          return;
+        }
+        if (!key) {
+          showToast('Введите секретный ключ', 'error');
+          return;
+        }
+
+        cloudCfg.url = url;
+        cloudCfg.secretKey = key;
+        cloudCfg.autoSync = autoSync;
+        saveCloudConfig();
+
+        pendingCloudConflict = null;
+        renderCloudModalMeta();
+        setCloudStatus('syncing');
+
+        try {
+          const resp = await cloudApiLoad(url, key);
+          const cloudHasData = !resp.empty && Boolean(resp.data);
+          const localHasData = hasMeaningfulProgress(state);
+
+          if (cloudHasData && !localHasData) {
+            applyCloudStatePayload(resp.data, resp.updatedAt);
+            cloudCfg.lastSyncAt = resp.updatedAt || new Date().toISOString();
+            saveCloudConfig();
+            setCloudStatus('synced');
+            renderCloudModalMeta();
+            showToast('☁️ Подключено! Прогресс загружен из облака', 'success');
+          } else if (!cloudHasData && localHasData) {
+            await pushToCloud({ silent: true });
+            showToast('☁️ Подключено! Локальный прогресс отправлен в облако', 'success');
+          } else if (!cloudHasData && !localHasData) {
+            await pushToCloud({ silent: true });
+            showToast('☁️ Облако успешно подключено!', 'success');
+          } else {
+            // Both local and cloud have data -> ask user in modal
+            pendingCloudConflict = resp;
+            setCloudStatus('synced');
+            renderCloudModalMeta();
+            showToast('Найдены данные и локально, и в облаке — выберите вариант', 'info');
+          }
+        } catch (err) {
+          console.error('Ошибка подключения облака:', err);
+          setCloudStatus('error');
+          showToast(`☁️ Ошибка подключения: ${err.message}`, 'error');
+        }
+      }
+
+      async function checkCloudOnStartup() {
+        if (!isCloudConfigured() || !cloudCfg.autoSync) {
+          setCloudStatus(isCloudConfigured() ? 'synced' : 'local');
+          return;
+        }
+        setCloudStatus('syncing');
+        try {
+          const resp = await cloudApiLoad(cloudCfg.url, cloudCfg.secretKey);
+          const cloudHasData = !resp.empty && Boolean(resp.data);
+          const localHasData = hasMeaningfulProgress(state);
+
+          if (cloudHasData) {
+            const cloudTs = resp.updatedAt ? Date.parse(resp.updatedAt) : 0;
+            const localTs = state.updatedAt ? Date.parse(state.updatedAt) : 0;
+
+            if (!localHasData || (cloudTs && cloudTs > localTs)) {
+              applyCloudStatePayload(resp.data, resp.updatedAt);
+              cloudCfg.lastSyncAt = resp.updatedAt || new Date().toISOString();
+              saveCloudConfig();
+              setCloudStatus('synced');
+              showToast('☁️ Прогресс обновлён из облака', 'info');
+              return;
+            }
+            if (localTs && cloudTs && localTs > cloudTs) {
+              await pushToCloud({ silent: true });
+              return;
+            }
+            setCloudStatus('synced');
+          } else if (localHasData) {
+            await pushToCloud({ silent: true });
+          } else {
+            setCloudStatus('synced');
+          }
+        } catch (err) {
+          console.error('Автопроверка облака не удалась:', err);
+          setCloudStatus('error');
+        }
+      }
+
+      function scheduleCloudAutoSync() {
+        if (!isCloudConfigured() || !cloudCfg.autoSync || pendingCloudConflict) return;
+        if (cloudSyncTimer) clearTimeout(cloudSyncTimer);
+        cloudSyncTimer = setTimeout(() => {
+          cloudSyncTimer = null;
+          pushToCloud({ silent: true });
+        }, 1500);
+      }
+
+      function saveState(markDataChanged = true) {
+        try {
+          if (markDataChanged) {
+            state.updatedAt = new Date().toISOString();
+          }
           localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+          if (markDataChanged) {
+            scheduleCloudAutoSync();
+          }
         } catch (err) {
           console.error('Ошибка сохранения:', err);
           showToast('Не удалось сохранить в localStorage', 'error');
@@ -3006,9 +4034,9 @@
           if (state.activity[k]) weekMinutes += state.activity[k].minutes || 0;
         }
 
-        // Total XP = Steps + Completed Blocks + 10 XP/active day + 1 XP/5 min
+        // Total XP = Steps + Completed Blocks + 10 XP/active day + 20 XP/gym + 1 XP/5 min
         const activeDays = activeKeys.length;
-        const activityXp = activeDays * 10 + Math.floor(totalMinutes / 5);
+        const activityXp = activeDays * 10 + gymDays * 20 + Math.floor(totalMinutes / 5);
         const xp = stepXp + activityXp;
 
         let curLvl = LEVELS[0];
@@ -3142,6 +4170,8 @@
       function applyTheme() {
         document.documentElement.setAttribute('data-theme', state.theme);
         document.getElementById('theme-icon').textContent = state.theme === 'dark' ? '☀️' : '🌙';
+        const mobIcon = document.getElementById('mob-theme-icon');
+        if (mobIcon) mobIcon.textContent = state.theme === 'dark' ? '☀️' : '🌙';
       }
 
       function renderHeader(metrics) {
@@ -3153,9 +4183,16 @@
         document.getElementById('hdr-ach-count').textContent = metrics.unlockedIds.length;
         document.getElementById('hdr-ach-total').textContent = ACHIEVEMENTS.length;
 
+        // Compact mobile header indicators
+        document.getElementById('mob-level').textContent = metrics.level;
+        document.getElementById('mob-streak').textContent = metrics.currentStreak;
+        document.getElementById('mob-ach-count').textContent = metrics.unlockedIds.length;
+        document.getElementById('mob-theme-icon').textContent = state.theme === 'dark' ? '☀️' : '🌙';
+        renderCloudStatusButton();
+
         const todayBadge = document.getElementById('tab-today-badge');
         if (metrics.todayMinutes > 0) {
-          todayBadge.textContent = `${metrics.todayMinutes}м`;
+          todayBadge.textContent = formatMinutesHuman(metrics.todayMinutes);
           todayBadge.classList.remove('hidden');
         } else {
           todayBadge.classList.add('hidden');
@@ -4035,6 +5072,7 @@
           evList.innerHTML = entry.events.map((ev) => `<span class="log-event-chip">${escapeHtml(ev)}</span>`).join('');
         } else {
           evWrap.classList.add('hidden');
+          evList.innerHTML = '';
         }
 
         document.getElementById('day-modal-overlay').classList.remove('hidden');
@@ -4050,6 +5088,28 @@
       function closeDayModal() {
         activeEditDateKey = null;
         document.getElementById('day-modal-overlay').classList.add('hidden');
+      }
+
+      function openCloudModal() {
+        document.getElementById('cloud-url-input').value = cloudCfg.url || '';
+        document.getElementById('cloud-key-input').value = cloudCfg.secretKey || '';
+        document.getElementById('cloud-key-input').type = 'password';
+        document.getElementById('btn-toggle-key-vis').textContent = '👁️';
+        document.getElementById('cloud-autosync-toggle').checked = cloudCfg.autoSync !== false;
+        renderCloudModalMeta();
+        document.getElementById('cloud-modal-overlay').classList.remove('hidden');
+      }
+
+      function closeCloudModal() {
+        document.getElementById('cloud-modal-overlay').classList.add('hidden');
+      }
+
+      function openHelpModal() {
+        document.getElementById('help-modal-overlay').classList.remove('hidden');
+      }
+
+      function closeHelpModal() {
+        document.getElementById('help-modal-overlay').classList.add('hidden');
       }
 
       function openRpgModal() {
@@ -4230,17 +5290,125 @@
       // =========================================================================
       function bindEvents() {
         // Theme
-        document.getElementById('btn-theme').addEventListener('click', () => {
+        const toggleTheme = () => {
           state.theme = state.theme === 'dark' ? 'light' : 'dark';
           applyTheme();
-          saveState();
+          saveState(false);
+        };
+        document.getElementById('btn-theme').addEventListener('click', toggleTheme);
+
+        // Mobile Compact Menu & Compact RPG Pill
+        const mobDropdown = document.getElementById('mobile-menu-dropdown');
+        const mobMenuBtn = document.getElementById('btn-mobile-menu');
+        const closeMobMenu = () => {
+          mobDropdown.classList.add('hidden');
+          mobMenuBtn.setAttribute('aria-expanded', 'false');
+        };
+        mobMenuBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const willOpen = mobDropdown.classList.contains('hidden');
+          mobDropdown.classList.toggle('hidden', !willOpen);
+          mobMenuBtn.setAttribute('aria-expanded', String(willOpen));
         });
+        document.getElementById('btn-mobile-rpg').addEventListener('click', openRpgModal);
+        document.getElementById('mob-menu-ach').addEventListener('click', () => { closeMobMenu(); openRpgModal(); });
+        document.getElementById('mob-menu-theme').addEventListener('click', () => { closeMobMenu(); toggleTheme(); });
+        document.getElementById('mob-menu-export').addEventListener('click', () => { closeMobMenu(); exportJson(); });
+        document.getElementById('mob-menu-import').addEventListener('click', () => { closeMobMenu(); });
+        document.getElementById('mob-menu-reset').addEventListener('click', () => {
+          closeMobMenu();
+          document.getElementById('reset-modal-overlay').classList.remove('hidden');
+        });
+        document.addEventListener('click', (e) => {
+          if (!e.target.closest('.mobile-menu-wrap')) closeMobMenu();
+        });
+
+        // Cloud Sync Modal Events
+        const cloudOverlay = document.getElementById('cloud-modal-overlay');
+        document.getElementById('btn-cloud-status').addEventListener('click', openCloudModal);
+        document.getElementById('btn-cloud-close').addEventListener('click', closeCloudModal);
+        document.getElementById('btn-cloud-done').addEventListener('click', closeCloudModal);
+        cloudOverlay.addEventListener('click', (e) => { if (e.target === cloudOverlay) closeCloudModal(); });
+
+        document.getElementById('btn-toggle-key-vis').addEventListener('click', () => {
+          const inp = document.getElementById('cloud-key-input');
+          const showing = inp.type === 'text';
+          inp.type = showing ? 'password' : 'text';
+          document.getElementById('btn-toggle-key-vis').textContent = showing ? '👁️' : '🙈';
+        });
+
+        document.getElementById('cloud-autosync-toggle').addEventListener('change', (e) => {
+          cloudCfg.autoSync = e.target.checked;
+          saveCloudConfig();
+          showToast(cloudCfg.autoSync ? 'Автосинхронизация включена' : 'Автосинхронизация выключена', 'info');
+        });
+
+        document.getElementById('btn-cloud-connect').addEventListener('click', connectAndCheckCloud);
+        document.getElementById('btn-cloud-pull').addEventListener('click', () => {
+          const url = document.getElementById('cloud-url-input').value.trim();
+          const key = document.getElementById('cloud-key-input').value.trim();
+          if (url && key) {
+            cloudCfg.url = url;
+            cloudCfg.secretKey = key;
+            saveCloudConfig();
+          }
+          pullFromCloud({ silent: false });
+        });
+        document.getElementById('btn-cloud-push').addEventListener('click', () => {
+          const url = document.getElementById('cloud-url-input').value.trim();
+          const key = document.getElementById('cloud-key-input').value.trim();
+          if (url && key) {
+            cloudCfg.url = url;
+            cloudCfg.secretKey = key;
+            saveCloudConfig();
+          }
+          pushToCloud({ silent: false });
+        });
+
+        document.getElementById('btn-conflict-use-cloud').addEventListener('click', () => {
+          if (!pendingCloudConflict || !pendingCloudConflict.data) return;
+          applyCloudStatePayload(pendingCloudConflict.data, pendingCloudConflict.updatedAt);
+          cloudCfg.lastSyncAt = pendingCloudConflict.updatedAt || new Date().toISOString();
+          saveCloudConfig();
+          pendingCloudConflict = null;
+          setCloudStatus('synced');
+          renderCloudModalMeta();
+          showToast('⬇️ Загружена версия из облака', 'success');
+        });
+
+        document.getElementById('btn-conflict-use-local').addEventListener('click', () => {
+          pendingCloudConflict = null;
+          pushToCloud({ silent: false });
+        });
+
+        document.getElementById('btn-cloud-disconnect').addEventListener('click', () => {
+          if (cloudSyncTimer) {
+            clearTimeout(cloudSyncTimer);
+            cloudSyncTimer = null;
+          }
+          pendingCloudConflict = null;
+          localStorage.removeItem(CLOUD_CFG_KEY);
+          cloudCfg = loadCloudConfig();
+          setCloudStatus('local');
+          document.getElementById('cloud-url-input').value = '';
+          document.getElementById('cloud-key-input').value = '';
+          document.getElementById('cloud-autosync-toggle').checked = true;
+          renderCloudModalMeta();
+          showToast('Облако отключено (локальные данные сохранены)', 'info');
+        });
+
+        // Help Modal Events
+        const helpOverlay = document.getElementById('help-modal-overlay');
+        document.getElementById('btn-open-help').addEventListener('click', openHelpModal);
+        document.getElementById('btn-help-close').addEventListener('click', closeHelpModal);
+        document.getElementById('btn-help-ok').addEventListener('click', closeHelpModal);
+        helpOverlay.addEventListener('click', (e) => { if (e.target === helpOverlay) closeHelpModal(); });
 
         // Tabs
         document.querySelectorAll('.tab-btn').forEach((btn) => {
           btn.addEventListener('click', () => {
             state.activeTab = btn.dataset.tab;
-            saveState();
+            saveState(false);
             renderAll();
           });
         });
@@ -4591,6 +5759,9 @@
           if (e.key === 'Escape') {
             closeStepDrawer();
             closeDayModal();
+            closeCloudModal();
+            closeHelpModal();
+            closeMobMenu();
             rpgOverlay.classList.add('hidden');
             resetOverlay.classList.add('hidden');
           }
@@ -4603,6 +5774,7 @@
       applyTheme();
       bindEvents();
       renderAll();
+      checkCloudOnStartup();
     })();
   </script>
 </body>
