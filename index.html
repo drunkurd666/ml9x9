@@ -2062,6 +2062,49 @@
       font-size: 12.5px;
     }
 
+    /* 1-Click Check-in Link Preview Modal */
+    .checkin-preview-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .checkin-preview-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 11px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      font-size: 13px;
+    }
+
+    .checkin-preview-icon {
+      font-size: 17px;
+      line-height: 1.2;
+      flex-shrink: 0;
+    }
+
+    .checkin-preview-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-top: 4px;
+    }
+
+    .checkin-step-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 8px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
     /* Floating Interactive Tooltip */
     .floating-tooltip {
       position: fixed;
@@ -3075,6 +3118,34 @@
     </div>
   </div>
 
+  <!-- ==================== 1-CLICK CHECK-IN LINK MODAL ==================== -->
+  <div id="checkin-link-overlay" class="overlay hidden">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <div>
+          <h3 style="margin:0;font-size:16px;font-weight:800;">⚡ Быстрый чек-ин по ссылке</h3>
+          <p id="checkin-link-date" class="section-sub"></p>
+        </div>
+        <button id="btn-checkin-link-close" type="button" class="btn btn-icon">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div style="font-size:12.5px;color:var(--text-secondary);">
+          Проверь, что именно будет записано в твой прогресс:
+        </div>
+        <div id="checkin-link-preview" class="checkin-preview-list"></div>
+        <div id="checkin-link-cloud-hint" class="security-callout hidden" style="background:rgba(16,185,129,0.09);border-color:rgba(16,185,129,0.3);">
+          ☁️ После подтверждения изменения автоматически синхронизируются с твоей Google Таблицей и телефоном.
+        </div>
+      </div>
+
+      <div class="modal-foot" style="justify-content:flex-end;">
+        <button id="btn-checkin-link-cancel" type="button" class="btn">Отмена</button>
+        <button id="btn-checkin-link-confirm" type="button" class="btn btn-primary">✅ Подтвердить и записать</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ==================== RESET CONFIRMATION MODAL ==================== -->
   <div id="reset-modal-overlay" class="overlay hidden">
     <div class="modal" style="max-width:440px" role="dialog" aria-modal="true">
@@ -3542,7 +3613,7 @@
       let activeEditDateKey = null;
       let editModalGymState = false;
       let lastPoppedDateKey = null;
-
+      let pendingCheckinPayload = null;
       let trackerFilters = { search: '', block: 'all', status: 'all' };
 
       // Runtime Timer
@@ -3797,7 +3868,6 @@
             await pushToCloud({ silent: true });
             showToast('☁️ Облако успешно подключено!', 'success');
           } else {
-            // Both local and cloud have data -> ask user in modal
             pendingCloudConflict = resp;
             setCloudStatus('synced');
             renderCloudModalMeta();
@@ -3899,7 +3969,7 @@
         if (m >= 120) return 4;
         if (m >= 60) return 3;
         if (m >= 20) return 2;
-        return 1; // 1–19 min OR micro-step / matrix step / gym
+        return 1;
       }
 
       function ensureDayEntry(dateKey) {
@@ -3920,7 +3990,7 @@
 
       function logActivityEvent(dateKey, { addMinutes = 0, eventText = null, note = null, toggleGym = false } = {}) {
         const entry = ensureDayEntry(dateKey);
-        entry.isDemo = false; // User interaction converts day to real
+        entry.isDemo = false;
         if (addMinutes > 0) {
           entry.minutes = (entry.minutes || 0) + addMinutes;
         }
@@ -3973,7 +4043,6 @@
           }
         });
 
-        // Activity Metrics
         const activeKeys = [];
         let totalMinutes = 0;
         let gymDays = 0;
@@ -3994,7 +4063,6 @@
 
         activeKeys.sort();
 
-        // Current Streak (today or yesterday anchor)
         const today = new Date();
         const todayKey = toDateKey(today);
         const yestKey = toDateKey(addDays(today, -1));
@@ -4012,7 +4080,6 @@
           cursor = addDays(cursor, -1);
         }
 
-        // Best Streak across all active dates
         let bestStreak = 0;
         let run = 0;
         let prevDate = null;
@@ -4027,14 +4094,12 @@
           prevDate = d;
         });
 
-        // Last 7 days minutes
         let weekMinutes = 0;
         for (let i = 0; i < 7; i++) {
           const k = toDateKey(addDays(today, -i));
           if (state.activity[k]) weekMinutes += state.activity[k].minutes || 0;
         }
 
-        // Total XP = Steps + Completed Blocks + 10 XP/active day + 20 XP/gym + 1 XP/5 min
         const activeDays = activeKeys.length;
         const activityXp = activeDays * 10 + gymDays * 20 + Math.floor(totalMinutes / 5);
         const xp = stepXp + activityXp;
@@ -4100,7 +4165,6 @@
         }
       }
 
-      // Web Audio Chime (zero external files)
       function playChime(type = 'timer') {
         if (!state.soundEnabled) return;
         try {
@@ -4183,7 +4247,6 @@
         document.getElementById('hdr-ach-count').textContent = metrics.unlockedIds.length;
         document.getElementById('hdr-ach-total').textContent = ACHIEVEMENTS.length;
 
-        // Compact mobile header indicators
         document.getElementById('mob-level').textContent = metrics.level;
         document.getElementById('mob-streak').textContent = metrics.currentStreak;
         document.getElementById('mob-ach-count').textContent = metrics.unlockedIds.length;
@@ -4198,7 +4261,6 @@
           todayBadge.classList.add('hidden');
         }
 
-        // Tabs
         document.querySelectorAll('.tab-btn').forEach((b) => {
           b.classList.toggle('active', b.dataset.tab === state.activeTab);
         });
@@ -4346,7 +4408,6 @@
           zoomWrap.classList.remove('hidden');
           ctxBanner.classList.add('hidden');
 
-          // Quick pills
           let pillsHtml = `
             <button type="button" class="btn" id="btn-back-to-9x9">← Назад к 9×9</button>
             <button type="button" class="zoom-pill-btn" data-zoom-pill="center" style="${state.zoomTarget === 'center' ? 'background:#4f46e5;color:#fff;border-color:#4f46e5;' : ''}">🎯 Центр</button>
@@ -4463,15 +4524,11 @@
         const today = new Date();
         const todayKey = toDateKey(today);
 
-        // Approximate weeks for 3, 6, 12 months
         const totalWeeks = monthsCount === 3 ? 14 : (monthsCount === 6 ? 27 : 53);
-
-        // Align end to Sunday of the current week (Mon=0 .. Sun=6)
         const todayMonIdx = (today.getDay() + 6) % 7;
         const endSunday = addDays(today, 6 - todayMonIdx);
         const startMonday = addDays(endSunday, -(totalWeeks * 7 - 1));
 
-        // Build week columns & month labels
         const weeks = [];
         const monthCols = [];
         let lastMonth = -1;
@@ -4533,12 +4590,10 @@
           </div>
         `;
 
-        // Period switcher UI
         document.querySelectorAll('#heatmap-period-switch button').forEach((btn) => {
           btn.classList.toggle('active', Number(btn.dataset.period) === state.heatmapMonths);
         });
 
-        // Clear pop flag after render
         lastPoppedDateKey = null;
       }
 
@@ -4577,11 +4632,9 @@
         const chartH = H - padT - padB;
 
         const maxVal = Math.max(120, ...days.map((d) => d.minutes));
-        // Round ceiling nicely to multiple of 30
         const yMax = Math.ceil(maxVal / 30) * 30;
         const yScale = (val) => padT + chartH - (val / yMax) * chartH;
 
-        // Horizontal grid ticks
         const yTicks = [0, 45, 90, yMax];
         const uniqueTicks = [...new Set(yTicks)].filter((v) => v <= yMax);
 
@@ -4598,17 +4651,15 @@
           </defs>
         `;
 
-        // Grid lines
         uniqueTicks.forEach((tick) => {
           const y = yScale(tick);
-          if (tick === 90) return; // drawn separately as target line
+          if (tick === 90) return;
           svgContent += `
             <line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="currentColor" stroke-opacity="0.1" stroke-width="1" />
             <text x="${padL - 7}" y="${y + 3.5}" text-anchor="end" fill="currentColor" fill-opacity="0.45" font-size="10" font-family="var(--font-mono)">${tick}</text>
           `;
         });
 
-        // Target line at 90 minutes
         const targetY = yScale(90);
         svgContent += `
           <line x1="${padL}" y1="${targetY}" x2="${W - padR}" y2="${targetY}" stroke="#38bdf8" stroke-opacity="0.65" stroke-width="1.3" stroke-dasharray="5 4" />
@@ -4616,7 +4667,6 @@
           <text x="${W - padR}" y="${targetY - 5}" text-anchor="end" fill="#38bdf8" font-size="9.5" font-weight="700">цель 90 мин</text>
         `;
 
-        // Bars
         const slotW = chartW / 14;
         const barW = Math.min(26, slotW - 10);
 
@@ -4650,7 +4700,6 @@
       }
 
       function renderActivityTab(metrics) {
-        // KPIs
         document.getElementById('kpi-streak').textContent = metrics.currentStreak;
         document.getElementById('kpi-streak-sub').textContent = metrics.currentStreak > 0
           ? (metrics.todayMinutes > 0 ? 'Сегодня уже засчитан ✓' : 'Отметься сегодня, чтобы продлить!')
@@ -4661,10 +4710,8 @@
         document.getElementById('kpi-week-time').textContent = formatMinutesHuman(metrics.weekMinutes);
         document.getElementById('kpi-total-time').textContent = `Всего за всё время: ${formatMinutesHuman(metrics.totalMinutes)}`;
 
-        // Demo buttons visibility
         document.getElementById('btn-clear-demo').classList.toggle('hidden', !metrics.hasDemoData);
 
-        // Today Check-In summary
         const todayKey = getTodayKey();
         const todayEntry = state.activity[todayKey];
         document.getElementById('checkin-today-date').textContent = `Сегодня: ${formatRuDateFull(todayKey)}`;
@@ -4682,11 +4729,9 @@
         if (todayEntry && todayEntry.note) extras.push(`«${todayEntry.note.slice(0, 38)}${todayEntry.note.length > 38 ? '…' : ''}»`);
         document.getElementById('today-sum-extra').textContent = extras.length ? extras.join(' · ') : 'Пока без дополнительных отметок';
 
-        // Heatmap & 14-Day Chart
         renderContributionHeatmap();
         render14DayBarChart();
 
-        // Activity Log
         const activeEntries = Object.keys(state.activity)
           .filter((k) => isDayActive(state.activity[k]))
           .sort((a, b) => b.localeCompare(a));
@@ -4933,7 +4978,6 @@
         renderTimerPresets();
         updateTimerUI();
 
-        // Populate step selector
         const focusedIds = Object.keys(state.steps).filter((id) => state.steps[id].focused);
         let opts = `<option value="">Свободная практика (без привязки)</option>`;
         if (focusedIds.length) {
@@ -4954,7 +4998,6 @@
         opts += `</optgroup>`;
         document.getElementById('timer-task-select').innerHTML = opts;
 
-        // Focus Tasks List
         document.getElementById('focus-pill-count').textContent = `${focusedIds.length} в фокусе`;
         const focusEl = document.getElementById('focus-tasks-list');
         if (focusedIds.length === 0) {
@@ -4995,7 +5038,6 @@
           }).join('');
         }
 
-        // Weekly Rhythm
         const todayJs = new Date().getDay();
         document.getElementById('weekly-rhythm-grid').innerHTML = WEEKLY_RHYTHM.map((d) => {
           const isToday = d.jsDay === todayJs;
@@ -5112,98 +5154,357 @@
         document.getElementById('help-modal-overlay').classList.add('hidden');
       }
 
-      function openRpgModal() {
-        const m = computeMetrics();
-        const nextTxt = m.nextLevelXp
-          ? `До уровня ${m.level + 1}: осталось ${m.nextLevelXp - m.xp} XP`
-          : 'Максимальный ранг достигнут!';
+      // =========================================================================
+      // 11B. 1-CLICK CHECK-IN LINK RECEIVER (#checkin?min=...&gym=1&done=1-3)
+      // =========================================================================
+      function clearCheckinUrlParams() {
+        try {
+          window.history.replaceState(null, '', window.location.pathname);
+        } catch (_) {
+          try { window.location.hash = ''; } catch (__) {}
+        }
+      }
 
-        document.getElementById('rpg-modal-body').innerHTML = `
-          <div style="padding:16px;border-radius:14px;background:linear-gradient(135deg,#0f172a,#1e293b);color:#f8fafc;border:1px solid rgba(148,163,184,0.22);display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
-            <div style="display:flex;align-items:center;gap:14px;">
-              <div class="lvl-badge" style="width:48px;height:48px;font-size:17px;border-radius:13px;">L${m.level}</div>
+      function parseCheckinParamsFromUrl() {
+        let rawQuery = '';
+        const hash = window.location.hash || '';
+
+        if (hash.startsWith('#checkin?')) {
+          rawQuery = hash.slice('#checkin?'.length);
+        } else if (hash.startsWith('#checkin=')) {
+          rawQuery = hash.slice('#checkin='.length);
+          try {
+            if (rawQuery.includes('%3D') || rawQuery.includes('%26')) {
+              rawQuery = decodeURIComponent(rawQuery);
+            }
+          } catch (_) {}
+        } else if (window.location.search) {
+          const sp = new URLSearchParams(window.location.search);
+          if (sp.get('checkin') === '1' || sp.get('checkin') === 'true') {
+            rawQuery = window.location.search.slice(1);
+          }
+        }
+
+        if (!rawQuery) return null;
+
+        const params = new URLSearchParams(rawQuery);
+        const rawDate = (params.get('date') || '').trim();
+        const dateKey = /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? rawDate : getTodayKey();
+        const minutes = Math.max(0, Math.min(1440, parseInt(params.get('min') || params.get('minutes') || '0', 10) || 0));
+        const gymRaw = (params.get('gym') || '').trim().toLowerCase();
+        const gym = gymRaw === '1' || gymRaw === 'true' || gymRaw === 'yes';
+
+        const parseStepIds = (val) => {
+          if (!val) return [];
+          const out = [];
+          val.split(',').forEach((part) => {
+            const id = part.trim();
+            if (state.steps[id] && !out.includes(id)) out.push(id);
+          });
+          return out;
+        };
+
+        const done = parseStepIds(params.get('done'));
+        const prog = parseStepIds(params.get('prog') || params.get('in_progress')).filter((id) => !done.includes(id));
+        const focus = parseStepIds(params.get('focus'));
+        const note = (params.get('note') || '').trim().slice(0, 500);
+
+        if (minutes === 0 && !gym && done.length === 0 && prog.length === 0 && focus.length === 0 && !note) {
+          return null;
+        }
+
+        return { dateKey, minutes, gym, done, prog, focus, note };
+      }
+
+      function openCheckinLinkModal(payload) {
+        pendingCheckinPayload = payload;
+        const isToday = payload.dateKey === getTodayKey();
+        document.getElementById('checkin-link-date').textContent = `Дата: ${formatRuDateFull(payload.dateKey)}${isToday ? ' (сегодня)' : ''}`;
+
+        const rows = [];
+
+        if (payload.minutes > 0) {
+          rows.push(`
+            <div class="checkin-preview-row">
+              <span class="checkin-preview-icon">⏱️</span>
               <div>
-                <div class="mono" style="font-size:11px;color:#fbbf24;text-transform:uppercase;">Текущий ранг</div>
-                <div style="font-size:19px;font-weight:800">${m.rank}</div>
-                <div style="font-size:12px;color:#94a3b8">${nextTxt}</div>
+                <div style="font-weight:700">Добавить время практики</div>
+                <div class="mono" style="color:var(--accent-emerald);font-weight:800;margin-top:2px">+${formatMinutesHuman(payload.minutes)}</div>
               </div>
             </div>
-            <div style="text-align:right">
-              <div class="mono" style="font-size:24px;font-weight:800;color:#fbbf24">${m.xp} XP</div>
-              <div style="font-size:11px;color:#94a3b8">Матрица: ${m.stepXp} XP · Активность: ${m.activityXp} XP</div>
+          `);
+        }
+
+        if (payload.gym) {
+          rows.push(`
+            <div class="checkin-preview-row">
+              <span class="checkin-preview-icon">💪</span>
+              <div>
+                <div style="font-weight:700">Тренировка в зале</div>
+                <div style="font-size:12px;color:var(--accent-amber);margin-top:2px">Отметить зал за этот день (+20 XP)</div>
+              </div>
+            </div>
+          `);
+        }
+
+        if (payload.done.length > 0) {
+          rows.push(`
+            <div class="checkin-preview-row">
+              <span class="checkin-preview-icon">✅</span>
+              <div style="flex:1;min-width:0;">
+                <div style="font-weight:700">Отметить выполненными (+50 XP за шаг)</div>
+                <div class="checkin-preview-steps">
+                  ${payload.done.map((id) => {
+                    const m = getStep(id);
+                    return `<span class="checkin-step-tag">${m.block.icon} <span class="mono" style="color:var(--text-muted)">${m.block.id}.${m.num}</span> ${escapeHtml(m.title)}</span>`;
+                  }).join('')}
+                </div>
+              </div>
+            </div>
+          `);
+        }
+
+        if (payload.prog.length > 0) {
+          rows.push(`
+            <div class="checkin-preview-row">
+              <span class="checkin-preview-icon">🔥</span>
+              <div style="flex:1;min-width:0;">
+                <div style="font-weight:700">Перевести «В процессе» (+15 XP за шаг)</div>
+                <div class="checkin-preview-steps">
+                  ${payload.prog.map((id) => {
+                    const m = getStep(id);
+                    return `<span class="checkin-step-tag">${m.block.icon} <span class="mono" style="color:var(--text-muted)">${m.block.id}.${m.num}</span> ${escapeHtml(m.title)}</span>`;
+                  }).join('')}
+                </div>
+              </div>
+            </div>
+          `);
+        }
+
+        if (payload.focus.length > 0) {
+          rows.push(`
+            <div class="checkin-preview-row">
+              <span class="checkin-preview-icon">⭐</span>
+              <div style="flex:1;min-width:0;">
+                <div style="font-weight:700">Добавить в «Фокус недели»</div>
+                <div class="checkin-preview-steps">
+                  ${payload.focus.map((id) => {
+                    const m = getStep(id);
+                    return `<span class="checkin-step-tag">${m.block.icon} <span class="mono" style="color:var(--text-muted)">${m.block.id}.${m.num}</span> ${escapeHtml(m.title)}</span>`;
+                  }).join('')}
+                </div>
+              </div>
+            </div>
+          `);
+        }
+
+        if (payload.note) {
+          rows.push(`
+            <div class="checkin-preview-row">
+              <span class="checkin-preview-icon">📝</span>
+              <div style="flex:1;min-width:0;">
+                <div style="font-weight:700">Заметка за день</div>
+                <div style="font-size:12.5px;color:var(--text-secondary);margin-top:2px;">«${escapeHtml(payload.note)}»</div>
+              </div>
+            </div>
+          `);
+        }
+
+        document.getElementById('checkin-link-preview').innerHTML = rows.join('');
+        document.getElementById('checkin-link-cloud-hint').classList.toggle('hidden', !isCloudConfigured());
+        document.getElementById('checkin-link-overlay').classList.remove('hidden');
+      }
+
+      function closeCheckinLinkModal(clearUrl = true) {
+        pendingCheckinPayload = null;
+        document.getElementById('checkin-link-overlay').classList.add('hidden');
+        if (clearUrl) clearCheckinUrlParams();
+      }
+
+      function applyIncomingCheckin() {
+        const p = pendingCheckinPayload;
+        if (!p) return;
+
+        const beforeXp = computeMetrics().xp;
+        const stepEvents = [];
+
+        p.done.forEach((id) => {
+          if (state.steps[id]) {
+            state.steps[id].status = 'done';
+            const m = getStep(id);
+            if (m) stepEvents.push(`✅ ${m.title}`);
+          }
+        });
+
+        p.prog.forEach((id) => {
+          if (state.steps[id]) {
+            state.steps[id].status = 'in_progress';
+            const m = getStep(id);
+            if (m) stepEvents.push(`🔥 ${m.title}`);
+          }
+        });
+
+        p.focus.forEach((id) => {
+          if (state.steps[id]) {
+            state.steps[id].focused = true;
+          }
+        });
+
+        const entry = ensureDayEntry(p.dateKey);
+        entry.isDemo = false;
+        if (p.minutes > 0) {
+          entry.minutes = (entry.minutes || 0) + p.minutes;
+        }
+        if (p.gym) {
+          entry.gym = true;
+        }
+        if (p.note) {
+          entry.note = entry.note && entry.note.trim().length > 0
+            ? `${entry.note.trim()} · ${p.note}`
+            : p.note;
+        }
+        if (stepEvents.length > 0) {
+          if (!Array.isArray(entry.events)) entry.events = [];
+          stepEvents.forEach((ev) => {
+            if (!entry.events.includes(ev)) {
+              entry.events.unshift(ev);
+            }
+          });
+          if (entry.events.length > 20) entry.events = entry.events.slice(0, 20);
+        }
+        cleanupDayIfEmpty(p.dateKey);
+        lastPoppedDateKey = p.dateKey;
+
+        closeCheckinLinkModal(true);
+        saveState(true);
+        const afterXp = computeMetrics().xp;
+        const gained = Math.max(0, afterXp - beforeXp);
+
+        renderAll();
+        playChime('timer');
+        showToast(`✅ Чек-ин записан!${gained > 0 ? ` (+${gained} XP)` : ''}`, 'success');
+      }
+
+      function checkIncomingCheckinLink() {
+        const payload = parseCheckinParamsFromUrl();
+        if (payload) {
+          openCheckinLinkModal(payload);
+        }
+      }
+
+      // =========================================================================
+      // 12. RPG MODAL, DEMO DATA & JSON EXPORT / IMPORT
+      // =========================================================================
+      function openRpgModal() {
+        const m = computeMetrics();
+        const nextText = m.nextLevelXp
+          ? `До L${m.level + 1}: осталось ${Math.max(0, m.nextLevelXp - m.xp)} XP`
+          : 'Максимальный ранг достигнут! 👑';
+
+        const achHtml = ACHIEVEMENTS.map((a) => {
+          const isUnlocked = m.unlockedIds.includes(a.id);
+          return `
+            <div class="ach-card ${isUnlocked ? 'unlocked' : 'locked'}">
+              <div style="font-size:22px;line-height:1;flex-shrink:0;">${a.icon}</div>
+              <div style="min-width:0;">
+                <div style="font-size:13px;font-weight:800;display:flex;align-items:center;gap:6px;">
+                  <span>${escapeHtml(a.title)}</span>
+                  ${isUnlocked ? '<span style="font-size:10.5px;color:#34d399;">✓</span>' : ''}
+                </div>
+                <div style="font-size:11.5px;color:var(--text-secondary);margin-top:2px;line-height:1.35;">${escapeHtml(a.desc)}</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        document.getElementById('rpg-modal-body').innerHTML = `
+          <div style="padding:14px;border-radius:14px;background:var(--bg-elevated);border:1px solid var(--border-subtle);">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+              <div style="display:flex;align-items:center;gap:11px;">
+                <div class="lvl-badge" style="width:42px;height:42px;font-size:14px;border-radius:11px;">L${m.level}</div>
+                <div>
+                  <div style="font-size:16px;font-weight:800;">${escapeHtml(m.rank)}</div>
+                  <div style="font-size:12px;color:var(--text-secondary);">${nextText}</div>
+                </div>
+              </div>
+              <div style="text-align:right;">
+                <div class="mono" style="font-size:20px;font-weight:800;color:var(--accent-amber);">${m.xp} XP</div>
+                <div style="font-size:11px;color:var(--text-muted);">Шаги: ${m.stepXp} • Активность: ${m.activityXp}</div>
+              </div>
+            </div>
+            <div class="progress-track" style="height:8px;">
+              <div class="progress-fill progress-fill-xp" style="width:${m.levelPct}%"></div>
             </div>
           </div>
 
           <div>
-            <div style="font-weight:700;font-size:14px;margin-bottom:10px;">Достижения (${m.unlockedIds.length} / ${ACHIEVEMENTS.length})</div>
-            <div class="ach-grid">
-              ${ACHIEVEMENTS.map((a) => {
-                const ok = m.unlockedIds.includes(a.id);
-                return `
-                  <div class="ach-card ${ok ? 'unlocked' : 'locked'}">
-                    <div style="font-size:22px;line-height:1">${a.icon}</div>
-                    <div style="min-width:0">
-                      <div style="font-size:12.5px;font-weight:700">${escapeHtml(a.title)} ${ok ? '<span style="color:#10b981">✓</span>' : ''}</div>
-                      <div style="font-size:11.5px;color:var(--text-secondary);margin-top:2px">${escapeHtml(a.desc)}</div>
-                    </div>
-                  </div>
-                `;
-              }).join('')}
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <div style="font-size:12px;font-weight:800;text-transform:uppercase;color:var(--text-muted);">Ачивки (${m.unlockedIds.length} / ${ACHIEVEMENTS.length})</div>
+              <span class="badge badge-amber mono">🔥 Серия: ${m.currentStreak} дн. (рекорд ${m.bestStreak})</span>
             </div>
+            <div class="ach-grid">${achHtml}</div>
           </div>
         `;
+
         document.getElementById('rpg-modal-overlay').classList.remove('hidden');
       }
 
-      // =========================================================================
-      // 12. DEMO WEEK GENERATOR & EXPORT / IMPORT
-      // =========================================================================
       function loadDemoWeek() {
         const today = new Date();
-        const sample = [
-          { offset: -12, min: 90, gym: false, note: 'NumPy broadcasting и векторизация', events: ['🔥 NumPy (матрицы, векторы)'] },
-          { offset: -10, min: 45, gym: true, note: 'Зал + 2 задачи Two Pointers', events: ['✅ Массивы и два указателя'] },
-          { offset: -8, min: 90, gym: false, note: 'Pandas groupby и очистка пропусков', events: ['🔥 Pandas (анализ и очистка)'] },
-          { offset: -6, min: 150, gym: false, note: 'Выходной блок: EDA датасета Titanic', events: ['✅ Визуализация (Matplotlib/Seaborn)'] },
-          { offset: -5, min: 180, gym: true, note: 'Зал утром + 3 часа ML + итог недели', events: ['✅ Итог недели (Вс 17:30, 10 мин)'] },
-          { offset: -4, min: 90, gym: false, note: 'Вечерний слот: SQL JOIN и оконные функции', events: ['🔥 База SQL (JOIN, агрегации)'] },
-          { offset: -3, min: 10, gym: true, note: 'Микро-шаг после зала, чтобы не рвать серию', events: ['⚡ Микро-шаг (10м)'] },
-          { offset: -2, min: 90, gym: false, note: 'Бинарный поиск + сортировки на Python', events: ['✅ Бинарный поиск и сортировки'] },
-          { offset: -1, min: 65, gym: false, note: 'Повторение градиентного спуска и производных', events: ['🔥 Градиентный спуск и оптимизация'] },
+        const pattern = [
+          { offset: -9, minutes: 90, gym: false, note: 'Разобрал NumPy broadcasting и векторизацию', events: ['✅ NumPy (матрицы, векторы)'] },
+          { offset: -8, minutes: 25, gym: true, note: 'Зал после работы + лёгкое повторение Big O', events: ['🔥 Сложность кода (Big O по времени и памяти)'] },
+          { offset: -7, minutes: 95, gym: false, note: 'Вечерний слот: Pandas groupby и чистка пропусков', events: ['🔥 Pandas (анализ и очистка)'] },
+          { offset: -6, minutes: 90, gym: false, note: 'Решил 3 задачи на Two Pointers', events: ['🔥 Массивы и два указателя'] },
+          { offset: -5, minutes: 10, gym: true, note: 'Микро-повтор перед залом в 21:00', events: [] },
+          { offset: -4, minutes: 180, gym: false, note: 'Субботний блок: EDA-графики в Matplotlib/Seaborn', events: ['✅ Визуализация (Matplotlib/Seaborn)'] },
+          { offset: -3, minutes: 150, gym: true, note: 'Зал утром + блок ML + итог недели', events: ['✅ Итог недели (Вс 17:30, 10 мин)'] },
+          { offset: -2, minutes: 90, gym: false, note: 'Хеш-таблицы и частотные словари на LeetCode', events: ['🔥 Хеш-таблицы (словари, сеты)'] },
+          { offset: -1, minutes: 15, gym: true, note: 'Короткий повтор конспекта после зала', events: [] },
         ];
 
-        sample.forEach((item) => {
-          const dk = toDateKey(addDays(today, item.offset));
+        let added = 0;
+        pattern.forEach((p) => {
+          const dk = toDateKey(addDays(today, p.offset));
           if (!state.activity[dk] || state.activity[dk].isDemo) {
             state.activity[dk] = {
-              minutes: item.min,
-              gym: item.gym,
-              note: item.note,
-              events: item.events,
+              minutes: p.minutes,
+              gym: p.gym,
+              note: p.note,
+              events: [...p.events],
               isDemo: true,
             };
+            added++;
           }
         });
 
-        saveState();
+        saveState(true);
         renderAll();
-        showToast('Демо-неделя загружена в график (шаги матрицы не затронуты)', 'info');
+        showToast(`Демо-неделя загружена (${added} дн.). Можно убрать кнопкой под картой.`, 'info');
       }
 
       function clearDemoData() {
+        let removed = 0;
         Object.keys(state.activity).forEach((dk) => {
           if (state.activity[dk] && state.activity[dk].isDemo) {
             delete state.activity[dk];
+            removed++;
           }
         });
-        saveState();
+        saveState(true);
         renderAll();
-        showToast('Демо-данные удалены', 'info');
+        showToast(removed > 0 ? `Демо-данные удалены (${removed} дн.)` : 'Демо-данных не найдено', 'info');
       }
 
       function exportJson() {
         try {
-          const blob = new Blob([JSON.stringify({ app: 'Ohtani ML Matrix v2', exportedAt: new Date().toISOString(), data: state }, null, 2)], { type: 'application/json' });
+          const backup = {
+            app: 'ohtani_ml_matrix',
+            version: 2,
+            exportedAt: new Date().toISOString(),
+            data: state,
+          };
+          const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json;charset=utf-8' });
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
@@ -5211,10 +5512,11 @@
           document.body.appendChild(a);
           a.click();
           a.remove();
-          URL.revokeObjectURL(url);
-          showToast('JSON-бэкап сохранён', 'success');
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+          showToast('Резервная копия JSON скачана (без ключей облака)', 'success');
         } catch (err) {
-          showToast('Ошибка экспорта', 'error');
+          console.error('Ошибка экспорта JSON:', err);
+          showToast('Не удалось скачать JSON', 'error');
         }
       }
 
@@ -5226,8 +5528,8 @@
             const parsed = JSON.parse(e.target.result);
             const data = parsed && parsed.data ? parsed.data : parsed;
             if (!data || !data.steps) throw new Error('bad format');
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-            state = loadState();
+            state = normalizeState(data, false);
+            saveState(true);
             applyTheme();
             renderAll();
             showToast('Прогресс успешно импортирован!', 'success');
@@ -5247,7 +5549,6 @@
         const prev = st.status;
         st.status = newStatus;
 
-        // Auto-log into today's activity when moved to in_progress or done
         if (prev !== newStatus && (newStatus === 'in_progress' || newStatus === 'done')) {
           const meta = getStep(stepId);
           const prefix = newStatus === 'done' ? '✅' : '🔥';
@@ -5289,7 +5590,6 @@
       // 14. EVENT LISTENERS
       // =========================================================================
       function bindEvents() {
-        // Theme
         const toggleTheme = () => {
           state.theme = state.theme === 'dark' ? 'light' : 'dark';
           applyTheme();
@@ -5297,7 +5597,6 @@
         };
         document.getElementById('btn-theme').addEventListener('click', toggleTheme);
 
-        // Mobile Compact Menu & Compact RPG Pill
         const mobDropdown = document.getElementById('mobile-menu-dropdown');
         const mobMenuBtn = document.getElementById('btn-mobile-menu');
         const closeMobMenu = () => {
@@ -5323,7 +5622,6 @@
           if (!e.target.closest('.mobile-menu-wrap')) closeMobMenu();
         });
 
-        // Cloud Sync Modal Events
         const cloudOverlay = document.getElementById('cloud-modal-overlay');
         document.getElementById('btn-cloud-status').addEventListener('click', openCloudModal);
         document.getElementById('btn-cloud-close').addEventListener('click', closeCloudModal);
@@ -5397,14 +5695,19 @@
           showToast('Облако отключено (локальные данные сохранены)', 'info');
         });
 
-        // Help Modal Events
         const helpOverlay = document.getElementById('help-modal-overlay');
         document.getElementById('btn-open-help').addEventListener('click', openHelpModal);
         document.getElementById('btn-help-close').addEventListener('click', closeHelpModal);
         document.getElementById('btn-help-ok').addEventListener('click', closeHelpModal);
         helpOverlay.addEventListener('click', (e) => { if (e.target === helpOverlay) closeHelpModal(); });
 
-        // Tabs
+        const checkinOverlay = document.getElementById('checkin-link-overlay');
+        document.getElementById('btn-checkin-link-close').addEventListener('click', () => closeCheckinLinkModal(true));
+        document.getElementById('btn-checkin-link-cancel').addEventListener('click', () => closeCheckinLinkModal(true));
+        document.getElementById('btn-checkin-link-confirm').addEventListener('click', applyIncomingCheckin);
+        checkinOverlay.addEventListener('click', (e) => { if (e.target === checkinOverlay) closeCheckinLinkModal(true); });
+        window.addEventListener('hashchange', checkIncomingCheckinLink);
+
         document.querySelectorAll('.tab-btn').forEach((btn) => {
           btn.addEventListener('click', () => {
             state.activeTab = btn.dataset.tab;
@@ -5413,7 +5716,6 @@
           });
         });
 
-        // Quick jumps
         document.getElementById('btn-hdr-streak').addEventListener('click', () => {
           state.activeTab = 'activity';
           saveState();
@@ -5428,7 +5730,6 @@
           openDayModal(getTodayKey());
         });
 
-        // Matrix mode buttons
         document.getElementById('btn-mode-full').addEventListener('click', () => {
           state.matrixMode = 'full';
           saveState();
@@ -5453,7 +5754,6 @@
           renderAll();
         });
 
-        // Export / Import / Reset
         document.getElementById('btn-export').addEventListener('click', exportJson);
         document.getElementById('input-import').addEventListener('change', (e) => {
           importJson(e.target.files[0]);
@@ -5479,14 +5779,12 @@
           showToast('Все данные очищены', 'info');
         });
 
-        // RPG Modal
         const rpgOverlay = document.getElementById('rpg-modal-overlay');
         document.getElementById('btn-open-rpg').addEventListener('click', openRpgModal);
         document.getElementById('btn-open-ach').addEventListener('click', openRpgModal);
         document.getElementById('btn-rpg-close').addEventListener('click', () => rpgOverlay.classList.add('hidden'));
         rpgOverlay.addEventListener('click', (e) => { if (e.target === rpgOverlay) rpgOverlay.classList.add('hidden'); });
 
-        // Drawer Events
         const drawerOverlay = document.getElementById('drawer-overlay');
         document.getElementById('btn-drawer-close').addEventListener('click', closeStepDrawer);
         drawerOverlay.addEventListener('click', (e) => { if (e.target === drawerOverlay) closeStepDrawer(); });
@@ -5524,7 +5822,6 @@
           openStepDrawer(`${b}-${s < 8 ? s + 1 : 1}`);
         });
 
-        // Day Editor Modal Events
         const dayOverlay = document.getElementById('day-modal-overlay');
         document.getElementById('btn-day-close').addEventListener('click', closeDayModal);
         document.getElementById('btn-day-cancel').addEventListener('click', closeDayModal);
@@ -5565,7 +5862,6 @@
           showToast('Запись за этот день очищена', 'info');
         });
 
-        // Activity Tab Static Controls
         document.querySelectorAll('#heatmap-period-switch button').forEach((btn) => {
           btn.addEventListener('click', () => {
             state.heatmapMonths = Number(btn.dataset.period);
@@ -5577,7 +5873,6 @@
         document.getElementById('btn-clear-demo').addEventListener('click', clearDemoData);
         document.getElementById('btn-edit-today-modal').addEventListener('click', () => openDayModal(getTodayKey()));
 
-        // Quick Check-in 1-click buttons
         document.querySelectorAll('[data-quick-min]').forEach((btn) => {
           btn.addEventListener('click', () => {
             const mins = Number(btn.dataset.quickMin);
@@ -5609,7 +5904,6 @@
           showToast('Активность за сегодня обновлена ✓', 'success');
         });
 
-        // Tracker Filters
         document.getElementById('tracker-search').addEventListener('input', (e) => {
           trackerFilters.search = e.target.value;
           renderTrackerTab(computeMetrics());
@@ -5625,7 +5919,6 @@
           });
         });
 
-        // Timer Controls
         document.getElementById('btn-timer-toggle').addEventListener('click', toggleTimer);
         document.getElementById('btn-timer-reset').addEventListener('click', () => {
           stopTimer();
@@ -5642,7 +5935,6 @@
           timer.taskId = e.target.value;
         });
 
-        // Delegated Clicks
         document.addEventListener('click', (e) => {
           const stepEl = e.target.closest('[data-step-id]');
           if (stepEl) { openStepDrawer(stepEl.dataset.stepId); return; }
@@ -5741,7 +6033,6 @@
           }
         });
 
-        // Delegated Hover Tooltips for Heatmap & 14-Day Bar Chart
         document.addEventListener('mousemove', (e) => {
           const target = e.target.closest('[data-heat-date], [data-bar-date]');
           if (target) {
@@ -5754,13 +6045,13 @@
 
         document.addEventListener('scroll', hideTooltip, true);
 
-        // Escape key closes overlays
         document.addEventListener('keydown', (e) => {
           if (e.key === 'Escape') {
             closeStepDrawer();
             closeDayModal();
             closeCloudModal();
             closeHelpModal();
+            closeCheckinLinkModal(true);
             closeMobMenu();
             rpgOverlay.classList.add('hidden');
             resetOverlay.classList.add('hidden');
@@ -5775,6 +6066,7 @@
       bindEvents();
       renderAll();
       checkCloudOnStartup();
+      checkIncomingCheckinLink();
     })();
   </script>
 </body>
